@@ -17,6 +17,10 @@ public class User {
     @Relationship(type = "TRANSFER")
     private Set<User> transfers;
 
+    public User() {
+
+    }
+
     public User(String address) {
         this.address = address;
         this.transfers = new HashSet<>();
@@ -31,6 +35,14 @@ public class User {
     }
 
     public void addTransfer(User to) {
+        if (transfers == null) {
+            transfers = new HashSet<>();
+        }
         transfers.add(to);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("User{address='%s', transfers=%s}", address, transfers);
     }
 }

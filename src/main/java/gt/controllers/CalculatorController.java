@@ -15,7 +15,7 @@ public class CalculatorController {
     }
 
     @GetMapping
-    public int getTrustLevel(@RequestParam("from") String from, @RequestParam("to") String to) {
+    public int getTrustLevel(@RequestParam String from, @RequestParam String to) {
         return trustCalculator.getTrustLevel(from, to);
     }
 
