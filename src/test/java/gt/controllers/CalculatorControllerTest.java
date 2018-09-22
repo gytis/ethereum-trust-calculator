@@ -1,5 +1,6 @@
-package gt;
+package gt.controllers;
 
+import gt.graph.TrustCalculator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
