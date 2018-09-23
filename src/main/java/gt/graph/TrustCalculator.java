@@ -8,10 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+/**
+ * Trust level calculator using Neo4j shortest path algorithm in a meantime filtering out blocked users.
+ */
 @Component
 public class TrustCalculator {
 
-    // TODO add depth limit to properties
+    // It is recommended to have a node limit for the shortest path search. It's set to 50 here.
     private static final String TRUST_QUERY = "MATCH (from:User {address: {from}}) WITH from " +
             "MATCH (to:User {address: {to}}), p=shortestPath((from)-[:TRANSFER*..50]->(to)) " +
             "WHERE ALL(x IN NODES(p)[1..-1] WHERE NOT x.blocked) " +

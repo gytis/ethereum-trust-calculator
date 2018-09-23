@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Users resource controller exposing two methods for blocking and unblocking user from a trust calculations.
+ */
 @RestController
 public class UsersController {
 

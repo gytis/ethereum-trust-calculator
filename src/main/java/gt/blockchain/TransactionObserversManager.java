@@ -1,6 +1,8 @@
 package gt.blockchain;
 
 import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Set;
 
 import gt.CalculatorProperties;
 import gt.graph.UsersRepository;
@@ -11,8 +13,13 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.Transaction;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscription;
 
+/**
+ * Register {@link GenericTransactionObserver} and {@link Erc20TransactionObserver} and make sure they're unsubscribed
+ * once the application is closed.
+ */
 @Component
 public class TransactionObserversManager implements InitializingBean, DisposableBean {
 
@@ -22,7 +29,7 @@ public class TransactionObserversManager implements InitializingBean, Disposable
 
     private final CalculatorProperties properties;
 
-    private Subscription subscription;
+    private Set<Subscription> subscriptions = new HashSet<>();
 
     public TransactionObserversManager(Web3j web3j, UsersRepository usersRepository, CalculatorProperties properties) {
         this.web3j = web3j;
@@ -32,15 +39,23 @@ public class TransactionObserversManager implements InitializingBean, Disposable
 
     @Override
     public void afterPropertiesSet() {
-        DefaultBlockParameter blockNumber =
-                DefaultBlockParameter.valueOf(BigInteger.valueOf(properties.getFirstBlockNumber()));
+        DefaultBlockParameter blockNumber = getBlockNumberParameter();
         Observable<Transaction> observable = web3j.catchUpToLatestAndSubscribeToNewTransactionsObservable(blockNumber);
-        GenericTransactionObserver genericTransactionObserver = new GenericTransactionObserver(usersRepository);
-        subscription = observable.subscribe(genericTransactionObserver);
+
+        subscribe(observable, new GenericTransactionObserver(usersRepository));
+        subscribe(observable, new Erc20TransactionObserver(web3j, usersRepository));
     }
 
     @Override
     public void destroy() {
-        subscription.unsubscribe();
+        subscriptions.forEach(Subscription::unsubscribe);
+    }
+
+    private DefaultBlockParameter getBlockNumberParameter() {
+        return DefaultBlockParameter.valueOf(BigInteger.valueOf(properties.getFirstBlockNumber()));
+    }
+
+    private void subscribe(Observable<Transaction> observable, Observer<Transaction> observer) {
+        subscriptions.add(observable.subscribe(observer));
     }
 }
