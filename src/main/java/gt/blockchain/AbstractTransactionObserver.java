@@ -35,6 +35,9 @@ public abstract class AbstractTransactionObserver implements Observer<Transactio
         User userFrom = getOrCreateUser(from);
         User userTo = getOrCreateUser(to);
 
+        if (userFrom.getTransfers().contains(userTo)) {
+            return;
+        }
         userFrom.addTransfer(userTo);
 
         usersRepository.save(userFrom);

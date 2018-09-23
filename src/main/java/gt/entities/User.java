@@ -2,6 +2,7 @@ package gt.entities;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.neo4j.ogm.annotation.Id;
@@ -54,5 +55,25 @@ public class User {
     @Override
     public String toString() {
         return String.format("User{address='%s', blocked='%s', transfers=%s}", address, blocked, transfers);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        User user = (User) o;
+
+        return Objects.equals(address, user.address);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(address);
     }
 }

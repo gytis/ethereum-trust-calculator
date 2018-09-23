@@ -76,4 +76,21 @@ public class GenericTransactionObserverTest {
         verify(mockUsersRepository, times(0)).save(any(User.class));
     }
 
+    @Test
+    public void shouldIgnoreDuplicateTransfers() {
+        User testA = new User("testA");
+        User testB = new User("testB");
+        testA.addTransfer(testB);
+
+        given(mockTransaction.getFrom()).willReturn("testA");
+        given(mockTransaction.getTo()).willReturn("testB");
+        given(mockUsersRepository.findByAddress("testA")).willReturn(testA);
+
+        genericTransactionObserver.onNext(mockTransaction);
+
+        verify(mockUsersRepository).findByAddress("testA");
+        verify(mockUsersRepository).findByAddress("testB");
+        verify(mockUsersRepository, times(0)).save(any(User.class));
+    }
+
 }
