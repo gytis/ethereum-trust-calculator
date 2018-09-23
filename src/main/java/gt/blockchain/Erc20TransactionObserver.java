@@ -51,6 +51,7 @@ public class Erc20TransactionObserver extends AbstractTransactionObserver {
                 .map(Log::getTopics)
                 .filter(this::isErc20TopicsList)
                 .map(this::getErc20DestinationAddress)
+                .peek(t -> LOGGER.debug("Saving ERC20 transaction '{}'", transactionReceipt.getTransactionHash()))
                 .forEach(to -> saveTransfer(transactionReceipt.getFrom(), to));
     }
 

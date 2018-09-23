@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.Transaction;
-import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 
@@ -39,11 +38,8 @@ public class TransactionObserversManager implements InitializingBean, Disposable
 
     @Override
     public void afterPropertiesSet() {
-        DefaultBlockParameter blockNumber = getBlockNumberParameter();
-        Observable<Transaction> observable = web3j.catchUpToLatestAndSubscribeToNewTransactionsObservable(blockNumber);
-
-        subscribe(observable, new GenericTransactionObserver(usersRepository));
-        subscribe(observable, new Erc20TransactionObserver(web3j, usersRepository));
+        subscribe(new GenericTransactionObserver(usersRepository));
+        subscribe(new Erc20TransactionObserver(web3j, usersRepository));
     }
 
     @Override
@@ -51,11 +47,11 @@ public class TransactionObserversManager implements InitializingBean, Disposable
         subscriptions.forEach(Subscription::unsubscribe);
     }
 
-    private DefaultBlockParameter getBlockNumberParameter() {
-        return DefaultBlockParameter.valueOf(BigInteger.valueOf(properties.getFirstBlockNumber()));
-    }
-
-    private void subscribe(Observable<Transaction> observable, Observer<Transaction> observer) {
-        subscriptions.add(observable.subscribe(observer));
+    private void subscribe(Observer<Transaction> observer) {
+        DefaultBlockParameter blockParameter =
+                DefaultBlockParameter.valueOf(BigInteger.valueOf(properties.getFirstBlockNumber()));
+        Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewTransactionsObservable(blockParameter)
+                .subscribe(observer);
+        subscriptions.add(subscription);
     }
 }
