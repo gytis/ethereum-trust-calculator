@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 public class TrustCalculator {
 
     // TODO add depth limit to properties
-    private static final String TRUST_QUERY =
-            "MATCH (from:User {address: {from}}) WITH from MATCH (to:User {address: {to}}), p=shortestPath((from)-[:TRANSFER*..50]->(to)) RETURN length(p)";
+    private static final String TRUST_QUERY = "MATCH (from:User {address: {from}}) WITH from " +
+            "MATCH (to:User {address: {to}}), p=shortestPath((from)-[:TRANSFER*..50]->(to)) " +
+            "WHERE ALL(x IN NODES(p)[1..-1] WHERE NOT x.blocked) " +
+            "RETURN length(p)";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrustCalculator.class);
 

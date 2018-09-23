@@ -17,6 +17,8 @@ public class User {
     @Relationship(type = "TRANSFER")
     private Set<User> transfers;
 
+    private boolean blocked;
+
     public User() {
 
     }
@@ -41,8 +43,16 @@ public class User {
         transfers.add(to);
     }
 
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
     @Override
     public String toString() {
-        return String.format("User{address='%s', transfers=%s}", address, transfers);
+        return String.format("User{address='%s', blocked='%s', transfers=%s}", address, blocked, transfers);
     }
 }

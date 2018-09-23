@@ -72,7 +72,7 @@ public class EthereumTrustCalculatorApplicationTests { // TODO should be IT
     }
 
     @Test
-    public void shouldGetTrustLevelBetweenUnrelatedUsers() {
+    public void shouldNotGetTrustLevelBetweenUnrelatedUsers() {
         given()
                 .baseUri(baseUri)
                 .queryParam("from", "c")
@@ -84,7 +84,7 @@ public class EthereumTrustCalculatorApplicationTests { // TODO should be IT
     }
 
     @Test
-    public void shouldGetTrustLevelBetweenNonexistentUsers() {
+    public void shouldNotGetTrustLevelBetweenNonexistentUsers() {
         given()
                 .baseUri(baseUri)
                 .queryParam("from", "x")
@@ -95,5 +95,44 @@ public class EthereumTrustCalculatorApplicationTests { // TODO should be IT
                 .body(is("-1"));
     }
 
+    @Test
+    public void shouldNotGetTrustLevelThroughBlockedUser() {
+        User user = usersRepository.findByAddress("b");
+        user.setBlocked(true);
+        usersRepository.save(user);
+
+        given()
+                .baseUri(baseUri)
+                .queryParam("from", "a")
+                .queryParam("to", "c")
+                .get()
+                .then()
+                .statusCode(200)
+                .body(is("-1"));
+    }
+
+    @Test
+    public void shouldSkipBlockedUsers() {
+        User userA = usersRepository.findByAddress("a");
+        User userC = usersRepository.findByAddress("c");
+        User userD = new User("d");
+        User userE = new User("e");
+        userE.setBlocked(true);
+
+        userC.addTransfer(userD);
+        userA.addTransfer(userE);
+        userE.addTransfer(userD);
+
+        usersRepository.saveAll(Arrays.asList(userA, userC, userD, userE));
+
+        given()
+                .baseUri(baseUri)
+                .queryParam("from", "a")
+                .queryParam("to", "d")
+                .get()
+                .then()
+                .statusCode(200)
+                .body(is("3"));
+    }
 
 }

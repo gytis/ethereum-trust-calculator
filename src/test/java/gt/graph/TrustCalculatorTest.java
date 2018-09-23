@@ -54,7 +54,7 @@ public class TrustCalculatorTest {
     }
 
     @Test
-    public void shouldGetTrustLevelBetweenUnconnectedAddresses() {
+    public void shouldNotGetTrustLevelBetweenUnconnectedAddresses() {
         int trustLevel = trustCalculator.getTrustLevel("test1", "test2");
 
         assertThat(trustLevel).isEqualTo(-1);
@@ -62,7 +62,7 @@ public class TrustCalculatorTest {
     }
 
     @Test
-    public void shouldGetTrustLevelBetweenInvalidAddresses() {
+    public void shouldNotGetTrustLevelBetweenInvalidAddresses() {
         int trustLevel = trustCalculator.getTrustLevel(null, null);
 
         assertThat(trustLevel).isEqualTo(-1);
