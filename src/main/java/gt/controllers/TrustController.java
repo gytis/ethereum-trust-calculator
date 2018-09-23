@@ -6,15 +6,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class CalculatorController {
+public class TrustController {
 
     private final TrustCalculator trustCalculator;
 
-    public CalculatorController(TrustCalculator trustCalculator) {
+    public TrustController(TrustCalculator trustCalculator) {
         this.trustCalculator = trustCalculator;
     }
 
-    @GetMapping
+    @GetMapping(path = "/trust")
     public int getTrustLevel(@RequestParam String from, @RequestParam String to) {
         return trustCalculator.getTrustLevel(from, to);
     }

@@ -53,7 +53,7 @@ public class EthereumTrustCalculatorApplicationTests { // TODO should be IT
                 .baseUri(baseUri)
                 .queryParam("from", "a")
                 .queryParam("to", "b")
-                .get()
+                .get("/trust")
                 .then()
                 .statusCode(200)
                 .body(is("1"));
@@ -65,7 +65,7 @@ public class EthereumTrustCalculatorApplicationTests { // TODO should be IT
                 .baseUri(baseUri)
                 .queryParam("from", "a")
                 .queryParam("to", "c")
-                .get()
+                .get("/trust")
                 .then()
                 .statusCode(200)
                 .body(is("2"));
@@ -77,7 +77,7 @@ public class EthereumTrustCalculatorApplicationTests { // TODO should be IT
                 .baseUri(baseUri)
                 .queryParam("from", "c")
                 .queryParam("to", "a")
-                .get()
+                .get("/trust")
                 .then()
                 .statusCode(200)
                 .body(is("-1"));
@@ -89,7 +89,7 @@ public class EthereumTrustCalculatorApplicationTests { // TODO should be IT
                 .baseUri(baseUri)
                 .queryParam("from", "x")
                 .queryParam("to", "z")
-                .get()
+                .get("/trust")
                 .then()
                 .statusCode(200)
                 .body(is("-1"));
@@ -97,15 +97,17 @@ public class EthereumTrustCalculatorApplicationTests { // TODO should be IT
 
     @Test
     public void shouldNotGetTrustLevelThroughBlockedUser() {
-        User user = usersRepository.findByAddress("b");
-        user.setBlocked(true);
-        usersRepository.save(user);
+        given()
+                .baseUri(baseUri)
+                .put("/users/b/block")
+                .then()
+                .statusCode(204);
 
         given()
                 .baseUri(baseUri)
                 .queryParam("from", "a")
                 .queryParam("to", "c")
-                .get()
+                .get("/trust")
                 .then()
                 .statusCode(200)
                 .body(is("-1"));
@@ -129,7 +131,7 @@ public class EthereumTrustCalculatorApplicationTests { // TODO should be IT
                 .baseUri(baseUri)
                 .queryParam("from", "a")
                 .queryParam("to", "d")
-                .get()
+                .get("/trust")
                 .then()
                 .statusCode(200)
                 .body(is("3"));
