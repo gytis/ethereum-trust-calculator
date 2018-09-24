@@ -18,7 +18,7 @@ import static org.hamcrest.CoreMatchers.is;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EthereumTrustCalculatorApplicationTests { // TODO should be IT
+public class EthereumTrustCalculatorApplicationIT {
 
     @Autowired
     private UsersRepository usersRepository;
