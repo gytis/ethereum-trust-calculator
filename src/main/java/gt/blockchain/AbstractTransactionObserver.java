@@ -27,6 +27,12 @@ public abstract class AbstractTransactionObserver implements Observer<Transactio
         LOGGER.warn(throwable.getMessage(), throwable);
     }
 
+    /**
+     * Save transfer information to the database. Ignore null or equal addresses.
+     *
+     * @param from Source address
+     * @param to   Destination address
+     */
     protected void saveTransfer(String from, String to) {
         if (from == null || to == null || from.equals(to)) {
             return;
@@ -36,6 +42,7 @@ public abstract class AbstractTransactionObserver implements Observer<Transactio
         User userTo = getOrCreateUser(to);
 
         if (userFrom.getTransfers().contains(userTo)) {
+            // Transfer between these users was already recorded, ignore.
             return;
         }
         userFrom.addTransfer(userTo);

@@ -50,6 +50,7 @@ public class TransactionObserversManager implements InitializingBean, Disposable
     private void subscribe(Observer<Transaction> observer) {
         DefaultBlockParameter blockParameter =
                 DefaultBlockParameter.valueOf(BigInteger.valueOf(properties.getFirstBlockNumber()));
+        // We need a separate observable for each observer to make sure that all transactions are sent to it.
         Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewTransactionsObservable(blockParameter)
                 .subscribe(observer);
         subscriptions.add(subscription);

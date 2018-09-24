@@ -15,11 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TrustCalculator {
 
-    /*
-    It is recommended to have a node limit for the shortest path search. It's set to 50 here.
-    Also, this query should include `WHERE NOT from.isBlocked AND NOT to.isBlocked` condition.
-    However, it was producing different results on different Neo4j versions. Thus isValidAddress method implementation.
-     */
+     // It is recommended to have a node limit for the shortest path search. It's set to 50 here.
     private static final String TRUST_QUERY = "MATCH (from:User {address: {from}}) WITH from " +
             "MATCH (to:User {address: {to}}), p=shortestPath((from)-[:TRANSFER*..50]->(to)) " +
             "WHERE ALL(x IN NODES(p)[1..-1] WHERE NOT x.blocked) " +
@@ -36,6 +32,14 @@ public class TrustCalculator {
         this.usersRepository = usersRepository;
     }
 
+    /**
+     * Calculate the shortest path between two addresses which is a trust level between two users.
+     * Trust level between non existent, null or blocked addresses is -1.
+     *
+     * @param from Source address
+     * @param to Destination address
+     * @return Trust level between two addresses
+     */
     public int getTrustLevel(String from, String to) {
         if (!isValidAddress(from) || !isValidAddress(to)) {
             LOGGER.debug("Trust level from '{}' to '{}' is '-1'", from, to);
@@ -66,6 +70,9 @@ public class TrustCalculator {
             return false;
         }
 
+        // This is an alternative blocked address check. Ideally Neo4j query would include
+        // `WHERE NOT from.isBlocked AND NOT to.isBlocked` condition. However, it was producing different results on
+        // different Neo4j versions.
         User user = usersRepository.findByAddress(address);
         return user != null && !user.isBlocked();
     }

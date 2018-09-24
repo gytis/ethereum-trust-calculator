@@ -31,11 +31,16 @@ public class Erc20TransactionObserver extends AbstractTransactionObserver {
         this.web3j = web3j;
     }
 
+    /**
+     * Get transaction receipt for the provided transaction, check if it's log contains ERC20 topic and if so save the
+     * transfer using the destination extracted from the log.
+     *
+     * @param transaction Transaction being handled
+     */
     @Override
     public void onNext(Transaction transaction) {
         LOGGER.debug("handling transaction '{}'", transaction.getHash());
         try {
-            // Get transaction receipt, which contains transaction logs, and verify if it's ERC20
             web3j.ethGetTransactionReceipt(transaction.getHash())
                     .send()
                     .getTransactionReceipt()

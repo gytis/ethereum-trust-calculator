@@ -2,6 +2,8 @@
 
 Application gathering Ethereum transfers in a graph and using it to calculate a trust between addresses.
 
+It uses `from` and `to` addresses from every transaction as well as extracts a destination from ERC20 transfers.
+
 # Usage
 
 ## Starting ethereum node
