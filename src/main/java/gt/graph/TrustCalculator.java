@@ -15,7 +15,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class TrustCalculator {
 
-    // It is recommended to have a node limit for the shortest path search. It's set to 50 here.
+    /*
+    It is recommended to have a node limit for the shortest path search. It's set to 50 here.
+    Also, this query should include `WHERE NOT from.isBlocked AND NOT to.isBlocked` condition.
+    However, it was producing different results on different Neo4j versions. Thus isValidAddress method implementation.
+     */
     private static final String TRUST_QUERY = "MATCH (from:User {address: {from}}) WITH from " +
             "MATCH (to:User {address: {to}}), p=shortestPath((from)-[:TRANSFER*..50]->(to)) " +
             "WHERE ALL(x IN NODES(p)[1..-1] WHERE NOT x.blocked) " +
