@@ -16,7 +16,7 @@ public class User {
     private String address;
 
     @Relationship(type = "TRANSFER")
-    private Set<User> transfers;
+    private Set<User> transfers = new HashSet<>();
 
     private boolean blocked;
 
@@ -26,7 +26,6 @@ public class User {
 
     public User(String address) {
         this.address = address;
-        this.transfers = new HashSet<>();
     }
 
     public String getAddress() {
@@ -38,9 +37,6 @@ public class User {
     }
 
     public void addTransfer(User to) {
-        if (transfers == null) {
-            transfers = new HashSet<>();
-        }
         transfers.add(to);
     }
 
