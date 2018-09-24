@@ -3,6 +3,7 @@ package gt.graph;
 import java.util.HashMap;
 import java.util.Map;
 
+import gt.entities.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,11 +25,20 @@ public class TrustCalculatorTest {
     @Mock
     private Session mockSession;
 
+    @Mock
+    private UsersRepository mockUsersRepository;
+
+    @Mock
+    private User mockUser;
+
     private TrustCalculator trustCalculator;
 
     @Before
     public void before() {
-        trustCalculator = new TrustCalculator(mockSession);
+        given(mockUsersRepository.findByAddress(anyString())).willReturn(mockUser);
+        given(mockUser.isBlocked()).willReturn(false);
+
+        trustCalculator = new TrustCalculator(mockSession, mockUsersRepository);
     }
 
     @Test
@@ -64,6 +74,16 @@ public class TrustCalculatorTest {
     @Test
     public void shouldNotGetTrustLevelBetweenInvalidAddresses() {
         int trustLevel = trustCalculator.getTrustLevel(null, null);
+
+        assertThat(trustLevel).isEqualTo(-1);
+        verify(mockSession, times(0)).queryForObject(eq(Integer.class), anyString(), anyMap());
+    }
+
+    @Test
+    public void shouldNotGetTrustLevelForBlockedAddress() {
+        given(mockUser.isBlocked()).willReturn(true);
+
+        int trustLevel = trustCalculator.getTrustLevel("test1", "test2");
 
         assertThat(trustLevel).isEqualTo(-1);
         verify(mockSession, times(0)).queryForObject(eq(Integer.class), anyString(), anyMap());

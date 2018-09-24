@@ -3,6 +3,7 @@ package gt.graph;
 import java.util.HashMap;
 import java.util.Map;
 
+import gt.entities.User;
 import org.neo4j.ogm.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +25,15 @@ public class TrustCalculator {
 
     private final Session session;
 
-    public TrustCalculator(Session session) {
+    private final UsersRepository usersRepository;
+
+    public TrustCalculator(Session session, UsersRepository usersRepository) {
         this.session = session;
+        this.usersRepository = usersRepository;
     }
 
     public int getTrustLevel(String from, String to) {
-        if (from == null || to == null) {
+        if (!isValidAddress(from) || !isValidAddress(to)) {
             LOGGER.debug("Trust level from '{}' to '{}' is '-1'", from, to);
             return -1;
         }
@@ -51,6 +55,15 @@ public class TrustCalculator {
 
         LOGGER.debug("Trust level from '{}' to '{}' is '{}'", from, to, trustLevel);
         return trustLevel;
+    }
+
+    private boolean isValidAddress(String address) {
+        if (address == null) {
+            return false;
+        }
+
+        User user = usersRepository.findByAddress(address);
+        return user != null && !user.isBlocked();
     }
 
 }

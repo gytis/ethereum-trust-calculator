@@ -114,6 +114,24 @@ public class EthereumTrustCalculatorApplicationIT {
     }
 
     @Test
+    public void shouldNotGetTrustLevelIfOriginIsBlocked() {
+        given()
+                .baseUri(baseUri)
+                .put("/users/a/block")
+                .then()
+                .statusCode(204);
+
+        given()
+                .baseUri(baseUri)
+                .queryParam("from", "a")
+                .queryParam("to", "c")
+                .get("/trust")
+                .then()
+                .statusCode(200)
+                .body(is("-1"));
+    }
+
+    @Test
     public void shouldSkipBlockedUsers() {
         User userA = usersRepository.findByAddress("a");
         User userC = usersRepository.findByAddress("c");
